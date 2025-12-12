@@ -85,7 +85,7 @@ export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {
               isFullscreen ? 'left-0' : 'w-full md:w-2/3 lg:w-1/2'
             }`}
           >
-            <Card variant="default" className="h-full flex flex-col m-4">
+            <Card variant="glass" className="h-full flex flex-col m-4">
               {/* Toolbar */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200/20 dark:border-gray-700/20">
                 <div className="flex items-center gap-2">
