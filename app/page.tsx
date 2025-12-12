@@ -3,7 +3,6 @@
 import React from 'react';
 import { MarketingHero } from '@/components/marketing/MarketingHero';
 import { FeatureGrid } from '@/components/marketing/FeatureGrid';
-import { AppPreview } from '@/components/marketing/AppPreview';
 import { useRouter } from 'next/navigation';
 
 // Feature flag check
@@ -30,9 +29,6 @@ export default function Home() {
 
       {/* Feature Grid */}
       <FeatureGrid />
-
-      {/* App Preview */}
-      <AppPreview />
 
       {/* Footer */}
       <footer className="py-8 px-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">

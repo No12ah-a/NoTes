@@ -1,26 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export const MarketingHero: React.FC = () => {
-  const svgRef = useRef<SVGPathElement>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    // Animate SVG stroke
-    if (svgRef.current) {
-      const path = svgRef.current;
-      const length = path.getTotalLength();
-      path.style.strokeDasharray = length.toString();
-      path.style.strokeDashoffset = length.toString();
-      
-      // Trigger animation
-      setTimeout(() => {
-        path.style.transition = 'stroke-dashoffset 2s ease-in-out';
-        path.style.strokeDashoffset = '0';
-      }, 100);
-    }
-  }, []);
+  const handleCreateNote = () => {
+    router.push('/notes');
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -33,40 +22,95 @@ export const MarketingHero: React.FC = () => {
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        {/* SVG Fountain Pen Animation */}
+        {/* Open Book Logo */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
           className="mb-8"
         >
           <svg
-            viewBox="0 0 400 100"
-            className="mx-auto w-full max-w-md h-24"
+            viewBox="0 0 200 160"
+            className="mx-auto w-full max-w-sm h-40"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              ref={svgRef}
-              d="M 40 50 Q 80 20, 120 50 T 200 50 Q 240 80, 280 50 T 360 50"
-              fill="none"
-              stroke="url(#gradient)"
-              strokeWidth="3"
-              strokeLinecap="round"
+            {/* Left Page */}
+            <motion.path
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              d="M 20 30 Q 20 20, 30 20 L 95 20 L 95 140 L 30 140 Q 20 140, 20 130 Z"
+              fill="url(#pageGradientLeft)"
+              stroke="#667eea"
+              strokeWidth="2"
             />
+            
+            {/* Right Page */}
+            <motion.path
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              d="M 105 20 L 170 20 Q 180 20, 180 30 L 180 130 Q 180 140, 170 140 L 105 140 Z"
+              fill="url(#pageGradientRight)"
+              stroke="#764ba2"
+              strokeWidth="2"
+            />
+            
+            {/* Spine/Binding */}
+            <motion.line
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
+              x1="100"
+              y1="20"
+              x2="100"
+              y2="140"
+              stroke="#667eea"
+              strokeWidth="3"
+              style={{ transformOrigin: 'center' }}
+            />
+            
+            {/* Decorative Lines (Left Page) */}
+            <motion.g
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
+              <line x1="35" y1="40" x2="85" y2="40" stroke="#667eea" strokeWidth="1.5" opacity="0.6" />
+              <line x1="35" y1="55" x2="75" y2="55" stroke="#667eea" strokeWidth="1.5" opacity="0.6" />
+              <line x1="35" y1="70" x2="80" y2="70" stroke="#667eea" strokeWidth="1.5" opacity="0.6" />
+            </motion.g>
+            
+            {/* Decorative Lines (Right Page) */}
+            <motion.g
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
+              <line x1="115" y1="40" x2="165" y2="40" stroke="#764ba2" strokeWidth="1.5" opacity="0.6" />
+              <line x1="125" y1="55" x2="165" y2="55" stroke="#764ba2" strokeWidth="1.5" opacity="0.6" />
+              <line x1="115" y1="70" x2="160" y2="70" stroke="#764ba2" strokeWidth="1.5" opacity="0.6" />
+            </motion.g>
+            
+            {/* Gradients */}
             <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style={{ stopColor: '#667eea', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#764ba2', stopOpacity: 1 }} />
+              <linearGradient id="pageGradientLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 0.95 }} />
+                <stop offset="100%" style={{ stopColor: '#f3e8ff', stopOpacity: 0.95 }} />
+              </linearGradient>
+              <linearGradient id="pageGradientRight" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 0.95 }} />
+                <stop offset="100%" style={{ stopColor: '#fce7f3', stopOpacity: 0.95 }} />
               </linearGradient>
             </defs>
           </svg>
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline with Open Book Style */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
           className="text-5xl md:text-7xl font-bold mb-6"
         >
           <span className="gradient-text font-['Pacifico',cursive]">NoTes</span>
@@ -95,13 +139,11 @@ export const MarketingHero: React.FC = () => {
         <motion.button
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.9, duration: 0.4 }}
+          transition={{ delay: 1.1, duration: 0.4 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-primary rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-          onClick={() => {
-            document.getElementById('app-preview')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+          onClick={handleCreateNote}
         >
           Create Your First Note
           <svg
@@ -123,7 +165,7 @@ export const MarketingHero: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.6 }}
+          transition={{ delay: 1.3, duration: 0.6 }}
           className="mt-12 flex flex-wrap justify-center gap-4 text-sm"
         >
           <span className="px-4 py-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-700">
@@ -137,30 +179,6 @@ export const MarketingHero: React.FC = () => {
           </span>
         </motion.div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      >
-        <div className="animate-bounce">
-          <svg
-            className="w-6 h-6 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </div>
-      </motion.div>
     </div>
   );
 };
