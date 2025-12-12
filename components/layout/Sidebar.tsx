@@ -9,15 +9,25 @@ import { Badge } from '@/components/ui/Badge';
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  onNavigate?: (page: string) => void;
 }
 
-export function Sidebar({ isOpen, onToggle }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, onNavigate }: SidebarProps) {
   const categories = [
     { name: 'All Notes', count: 42, color: 'primary' },
     { name: 'Personal', count: 15, color: 'secondary' },
     { name: 'Work', count: 20, color: 'accent' },
     { name: 'Ideas', count: 7, color: 'primary' },
   ];
+  
+  const handleNavClick = (page: string) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else {
+      // Default behavior: show alert for now
+      alert(`${page} feature coming soon!`);
+    }
+  };
   
   return (
     <>
@@ -49,10 +59,10 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           
           {/* Navigation */}
           <nav className="flex-1 space-y-2">
-            <NavItem icon={<Home className="w-5 h-5" />} label="Home" active />
-            <NavItem icon={<Search className="w-5 h-5" />} label="Search" />
-            <NavItem icon={<Tag className="w-5 h-5" />} label="Tags" />
-            <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
+            <NavItem icon={<Home className="w-5 h-5" />} label="Home" active onClick={() => handleNavClick('Home')} />
+            <NavItem icon={<Search className="w-5 h-5" />} label="Search" onClick={() => handleNavClick('Search')} />
+            <NavItem icon={<Tag className="w-5 h-5" />} label="Tags" onClick={() => handleNavClick('Tags')} />
+            <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" onClick={() => handleNavClick('Settings')} />
           </nav>
           
           {/* Categories */}
@@ -83,12 +93,15 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 }
 
-function NavItem({ icon, label, active = false }: NavItemProps) {
+function NavItem({ icon, label, active = false, onClick }: NavItemProps) {
   return (
     <motion.div
       whileHover={{ x: 5 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
       className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
         active 
           ? 'bg-gradient-primary text-white' 
