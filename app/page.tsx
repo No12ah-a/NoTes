@@ -15,41 +15,49 @@ import { Sparkles } from 'lucide-react';
 import { FadeIn } from '@/components/animations/FadeIn';
 import { BackgroundAnimation } from '@/components/animations/BackgroundAnimation';
 
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  createdAt: Date;
+}
+
+// Static sample notes to avoid re-creating on each render
+const SAMPLE_NOTES: Note[] = [
+  {
+    id: '1',
+    title: 'Welcome to NoTes',
+    content: 'This is your modern AI-powered note-taking application with a beautiful interface. Start by creating your first note with the + button below.',
+    category: 'Personal',
+    tags: ['welcome', 'getting-started'],
+    createdAt: new Date('2024-01-01T12:00:00'),
+  },
+  {
+    id: '2',
+    title: 'Project Ideas',
+    content: 'Build a next-generation note-taking app with AI features, modern UI, and seamless user experience.',
+    category: 'Ideas',
+    tags: ['project', 'ai', 'notes'],
+    createdAt: new Date('2024-01-01T11:00:00'),
+  },
+  {
+    id: '3',
+    title: 'Meeting Notes',
+    content: 'Discussed the new design system implementation. Key points: glassmorphism, gradient accents, smooth animations.',
+    category: 'Work',
+    tags: ['meeting', 'design'],
+    createdAt: new Date('2023-12-31T12:00:00'),
+  },
+];
+
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [editorOpen, setEditorOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<any>(null);
-  
-  // Sample notes data
-  const sampleNotes = [
-    {
-      id: '1',
-      title: 'Welcome to NoTes',
-      content: 'This is your modern AI-powered note-taking application with a beautiful interface. Start by creating your first note with the + button below.',
-      category: 'Personal',
-      tags: ['welcome', 'getting-started'],
-      createdAt: new Date(),
-    },
-    {
-      id: '2',
-      title: 'Project Ideas',
-      content: 'Build a next-generation note-taking app with AI features, modern UI, and seamless user experience.',
-      category: 'Ideas',
-      tags: ['project', 'ai', 'notes'],
-      createdAt: new Date(Date.now() - 1000 * 60 * 60),
-    },
-    {
-      id: '3',
-      title: 'Meeting Notes',
-      content: 'Discussed the new design system implementation. Key points: glassmorphism, gradient accents, smooth animations.',
-      category: 'Work',
-      tags: ['meeting', 'design'],
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-    },
-  ];
-  
-  const [notes, setNotes] = useState(sampleNotes);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES);
   
   const filteredNotes = notes.filter(note =>
     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -74,20 +82,23 @@ export default function Home() {
     toast.success('Note deleted successfully');
   };
   
-  const handleShare = (id: string) => {
+  const handleShare = () => {
     toast.success('Note link copied to clipboard');
   };
   
-  const handleSave = (note: any) => {
+  const handleSave = (note: Partial<Note> & { id?: string }) => {
     if (note.id) {
       // Update existing note
-      setNotes(notes.map(n => n.id === note.id ? { ...n, ...note } : n));
+      setNotes(notes.map(n => n.id === note.id ? { ...n, ...note } as Note : n));
       toast.success('Note updated successfully');
     } else {
       // Create new note
-      const newNote = {
-        ...note,
+      const newNote: Note = {
         id: String(Date.now()),
+        title: note.title || 'Untitled',
+        content: note.content || '',
+        category: note.category || 'Personal',
+        tags: note.tags || [],
         createdAt: new Date(),
       };
       setNotes([newNote, ...notes]);
@@ -161,7 +172,7 @@ export default function Home() {
       <NoteEditor
         isOpen={editorOpen}
         onClose={() => setEditorOpen(false)}
-        note={selectedNote}
+        note={selectedNote || undefined}
         onSave={handleSave}
       />
       

@@ -26,7 +26,7 @@ interface NoteCardProps {
 export function NoteCard({ note, onEdit, onDelete, onShare }: NoteCardProps) {
   const [showActions, setShowActions] = React.useState(false);
   
-  const categoryColors: Record<string, any> = {
+  const categoryColors: Record<string, string> = {
     Personal: 'primary',
     Work: 'accent',
     Ideas: 'secondary',
@@ -44,7 +44,12 @@ export function NoteCard({ note, onEdit, onDelete, onShare }: NoteCardProps) {
     >
       <Card hover className="relative overflow-hidden">
         {/* Category indicator strip */}
-        <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-${categoryColors[note.category] || 'default'}`} />
+        <div className={`absolute left-0 top-0 bottom-0 w-1 ${
+          note.category === 'Personal' ? 'bg-gradient-primary' :
+          note.category === 'Work' ? 'bg-gradient-accent' :
+          note.category === 'Ideas' ? 'bg-gradient-secondary' :
+          'bg-gray-300'
+        }`} />
         
         <CardHeader>
           <div className="flex items-start justify-between">
@@ -76,7 +81,11 @@ export function NoteCard({ note, onEdit, onDelete, onShare }: NoteCardProps) {
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-3">
             {note.tags.map((tag) => (
-              <Badge key={tag} size="sm" variant="primary">
+              <Badge 
+                key={tag} 
+                size="sm" 
+                variant={categoryColors[note.category] as 'primary' | 'secondary' | 'accent' | 'default'}
+              >
                 {tag}
               </Badge>
             ))}

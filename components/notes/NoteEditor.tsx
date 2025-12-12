@@ -18,7 +18,14 @@ interface NoteEditorProps {
     category: string;
     tags: string[];
   };
-  onSave?: (note: any) => void;
+  onSave?: (note: {
+    id?: string;
+    title: string;
+    content: string;
+    category: string;
+    tags: string[];
+    updatedAt?: Date;
+  }) => void;
 }
 
 export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {

@@ -5,14 +5,17 @@ import { motion } from 'framer-motion';
 import { Sun, Moon } from 'lucide-react';
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  // Initialize state with a function to avoid issues
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
   
   useEffect(() => {
-    // Check system preference
+    // Listen for system theme changes
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setIsDark(darkModeMediaQuery.matches);
-    
-    // Listen for changes
     const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
     darkModeMediaQuery.addEventListener('change', handler);
     

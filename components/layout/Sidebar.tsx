@@ -66,7 +66,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                 >
                   <span className="text-sm">{category.name}</span>
-                  <Badge variant={category.color as any} size="sm">
+                  <Badge variant={category.color as 'primary' | 'secondary' | 'accent' | 'default'} size="sm">
                     {category.count}
                   </Badge>
                 </motion.div>
