@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Maximize2, Minimize2, Check, Sparkles, Bold, Italic, List, Code, Underline, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { X, Maximize2, Minimize2, Check, Sparkles, Bold, Italic, List, Code, Underline, AlignLeft, AlignCenter, AlignRight, Tag, Plus } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import ReactMarkdown from 'react-markdown';
@@ -26,16 +26,115 @@ interface NoteEditorProps {
     tags: string[];
     updatedAt?: Date;
   }) => void;
+  existingTags?: string[]; // All tags used across notes for autocomplete
 }
 
-export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {
+export function NoteEditor({ isOpen, onClose, note, onSave, existingTags = [] }: NoteEditorProps) {
   const [title, setTitle] = useState(note?.title || '');
   const [content, setContent] = useState(note?.content || '');
+  const [tags, setTags] = useState<string[]>(note?.tags || []);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [fontFamily, setFontFamily] = useState('Special Elite');
   const [fontSize, setFontSize] = useState('16');
+  
+  // Tags feature state
+  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedAutocompleteIndex, setSelectedAutocompleteIndex] = useState(0);
+  const tagInputRef = useRef<HTMLInputElement>(null);
+  
+  const MAX_TAGS = 20;
+  const MAX_TAG_LENGTH = 30;
+  
+  // Get autocomplete suggestions
+  const getAutocompleteSuggestions = () => {
+    if (!tagInput.trim()) return [];
+    const input = tagInput.toLowerCase();
+    return existingTags
+      .filter(tag => 
+        tag.toLowerCase().includes(input) && 
+        !tags.some(t => t.toLowerCase() === tag.toLowerCase())
+      )
+      .slice(0, 5);
+  };
+  
+  const autocompleteSuggestions = getAutocompleteSuggestions();
+  
+  // Add tag from input
+  const addTag = (tagText: string) => {
+    const trimmedTag = tagText.trim().substring(0, MAX_TAG_LENGTH);
+    if (!trimmedTag) return;
+    
+    // Check if tag already exists (case-insensitive)
+    const tagLower = trimmedTag.toLowerCase();
+    if (tags.some(t => t.toLowerCase() === tagLower)) {
+      // Silently merge duplicates
+      setTagInput('');
+      return;
+    }
+    
+    // Check max tags limit
+    if (tags.length >= MAX_TAGS) {
+      return;
+    }
+    
+    setTags([...tags, trimmedTag]);
+    setTagInput('');
+    setShowAutocomplete(false);
+  };
+  
+  // Handle tag input
+  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTagInput(value);
+    setShowAutocomplete(value.trim().length > 0);
+    setSelectedAutocompleteIndex(0);
+  };
+  
+  // Handle tag input key press
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (showAutocomplete && autocompleteSuggestions.length > 0) {
+        addTag(autocompleteSuggestions[selectedAutocompleteIndex]);
+      } else {
+        addTag(tagInput);
+      }
+    } else if (e.key === ',' || e.key === ' ') {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedAutocompleteIndex(prev => 
+        Math.min(prev + 1, autocompleteSuggestions.length - 1)
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedAutocompleteIndex(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Escape') {
+      setShowAutocomplete(false);
+    }
+  };
+  
+  // Remove tag
+  const removeTag = (index: number) => {
+    const removedTag = tags[index];
+    setTags(tags.filter((_, i) => i !== index));
+    
+    // Announce to screen reader
+    if (typeof window !== 'undefined') {
+      const announcement = document.createElement('div');
+      announcement.setAttribute('role', 'status');
+      announcement.setAttribute('aria-live', 'polite');
+      announcement.className = 'sr-only';
+      announcement.textContent = `Tag removed: ${removedTag}`;
+      document.body.appendChild(announcement);
+      setTimeout(() => document.body.removeChild(announcement), 1000);
+    }
+  };
   
   const handleSave = async () => {
     setIsSaving(true);
@@ -46,10 +145,11 @@ export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {
       title,
       content,
       category: note?.category || 'Personal',
-      tags: note?.tags || [],
+      tags,
       updatedAt: new Date(),
     });
     setIsSaving(false);
+    onClose();
   };
   
   const insertMarkdown = (syntax: string, placeholder: string = '') => {
@@ -238,7 +338,147 @@ export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Note title..."
                   className="w-full text-2xl font-bold bg-transparent outline-none"
+                  aria-label="Note title"
                 />
+              </div>
+              
+              {/* Tags Row - Directly under title */}
+              <div className="px-4 py-3 border-b border-gray-200/20 dark:border-gray-700/20 bg-gray-50/50 dark:bg-gray-800/50">
+                <button
+                  onClick={() => setIsTagsExpanded(!isTagsExpanded)}
+                  className="flex items-center gap-2 w-full text-left group"
+                  aria-expanded={isTagsExpanded}
+                  aria-label="Tags section"
+                >
+                  <Tag className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Tags {tags.length > 0 && `(${tags.length})`}
+                  </span>
+                  {tags.length > 0 && !isTagsExpanded && (
+                    <div className="flex items-center gap-1 ml-2 overflow-hidden">
+                      {tags.slice(0, 3).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-0.5 rounded-full text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {tags.length > 3 && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          +{tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+                
+                <AnimatePresence>
+                  {isTagsExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="mt-3 overflow-hidden"
+                    >
+                      {/* Existing Tags Chips */}
+                      <div className="flex flex-wrap gap-2 mb-3" role="list" aria-label="Current tags">
+                        {tags.map((tag, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            role="listitem"
+                            className="group relative"
+                          >
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium shadow-sm hover:shadow-md transition-all">
+                              {tag}
+                              <button
+                                onClick={() => removeTag(index)}
+                                className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                                aria-label={`Remove tag ${tag}`}
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </span>
+                          </motion.div>
+                        ))}
+                        
+                        {/* Add Tag Chip */}
+                        {tags.length < MAX_TAGS && (
+                          <div className="relative">
+                            <button
+                              onClick={() => {
+                                setTagInput(' ');
+                                setTimeout(() => tagInputRef.current?.focus(), 10);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                              aria-label="Add new tag"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              Add tag
+                            </button>
+                            <input
+                              ref={tagInputRef}
+                              type="text"
+                              value={tagInput}
+                              onChange={handleTagInputChange}
+                              onKeyDown={handleTagInputKeyDown}
+                              onFocus={() => setTagInput('')}
+                              onBlur={() => {
+                                if (tagInput.trim()) {
+                                  addTag(tagInput);
+                                } else {
+                                  setTagInput('');
+                                }
+                                setTimeout(() => setShowAutocomplete(false), 200);
+                              }}
+                              placeholder="Type tag name..."
+                              maxLength={MAX_TAG_LENGTH}
+                              className="absolute top-0 left-0 opacity-0 pointer-events-none px-3 py-1.5 rounded-full bg-white dark:bg-gray-700 border-2 border-purple-500 text-sm font-medium outline-none min-w-[120px] focus:opacity-100 focus:pointer-events-auto"
+                              aria-label="Tag input"
+                              aria-describedby="tag-help"
+                            />
+                            
+                            {/* Autocomplete Dropdown */}
+                            {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute top-full mt-1 left-0 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-10 min-w-[200px]"
+                                role="listbox"
+                                aria-label="Tag suggestions"
+                              >
+                                {autocompleteSuggestions.map((suggestion, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => addTag(suggestion)}
+                                    className={`w-full text-left px-3 py-2 text-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors ${
+                                      index === selectedAutocompleteIndex 
+                                        ? 'bg-purple-100 dark:bg-purple-900/30' 
+                                        : ''
+                                    }`}
+                                    role="option"
+                                    aria-selected={index === selectedAutocompleteIndex}
+                                  >
+                                    {suggestion}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <p id="tag-help" className="text-xs text-gray-500 dark:text-gray-400">
+                        Press comma or space to add tags. Max {MAX_TAGS} tags, {MAX_TAG_LENGTH} characters each.
+                        {tags.length >= MAX_TAGS && ' Tag limit reached.'}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               
               {/* Content Area */}

@@ -235,6 +235,7 @@ export default function Home() {
         onClose={() => setEditorOpen(false)}
         note={selectedNote || undefined}
         onSave={handleSave}
+        existingTags={Array.from(new Set(notes.flatMap(n => n.tags)))}
       />
       
       {/* Settings Modal */}
