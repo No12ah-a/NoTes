@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Maximize2, Minimize2, Check, Sparkles, Bold, Italic, List, Code, Underline, AlignLeft, AlignCenter, AlignRight, Tag, Plus } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
