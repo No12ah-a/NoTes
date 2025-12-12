@@ -58,7 +58,7 @@ export function SettingsModal({
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <Card variant="glass" className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <div className="w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl p-6 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-indigo-900 dark:via-purple-900 dark:to-pink-900 shadow-2xl border-2 border-purple-300 dark:border-purple-700">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Settings</h2>
@@ -145,7 +145,7 @@ export function SettingsModal({
                   Close Settings
                 </Button>
               </div>
-            </Card>
+            </div>
           </motion.div>
         </>
       )}

@@ -1,3 +1,6 @@
+/* Font imports for Britney-style and Typewriter fonts - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Special+Elite&family=Courier+Prime&display=swap');
+
 @import "tailwindcss";
 
 :root {
@@ -56,7 +59,17 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Verdana, Geneva, 'DejaVu Sans', sans-serif;
+  font-family: 'Courier Prime', 'Courier New', monospace;
+}
+
+/* Britney-style font for app title */
+.app-title {
+  font-family: 'Pacifico', cursive;
+}
+
+/* Typewriter font for content */
+.typewriter-font {
+  font-family: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
 }
 
 /* Glassmorphism utility classes */

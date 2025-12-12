@@ -179,7 +179,7 @@ export default function Home() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-2xl font-bold app-title">
                   <GradientText>NoTes</GradientText>
                 </h1>
               </div>
