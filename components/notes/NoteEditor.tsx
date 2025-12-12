@@ -75,17 +75,17 @@ export function NoteEditor({ isOpen, onClose, note, onSave }: NoteEditorProps) {
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           />
           
-          {/* Editor Panel */}
+          {/* Editor Panel - Center Aligned */}
           <motion.div
-            initial={{ x: '100%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed right-0 top-0 bottom-0 z-50 ${
-              isFullscreen ? 'left-0' : 'w-full md:w-2/3 lg:w-1/2'
-            }`}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <Card variant="glass" className="h-full flex flex-col m-4">
+            <Card variant="glass" className={`w-full ${
+              isFullscreen ? 'h-full' : 'max-w-4xl max-h-[90vh]'
+            } flex flex-col`}>
               {/* Toolbar */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200/20 dark:border-gray-700/20">
                 <div className="flex items-center gap-2">

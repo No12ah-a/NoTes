@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { NotesList } from '@/components/notes/NotesList';
 import { NoteEditor } from '@/components/notes/NoteEditor';
@@ -11,6 +11,8 @@ import { GradientText } from '@/components/ui/GradientText';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { ToastProvider, toast } from '@/components/ui/Toast';
+import { SettingsModal } from '@/components/modals/SettingsModal';
+import { TagsModal } from '@/components/modals/TagsModal';
 import { Sparkles } from 'lucide-react';
 import { FadeIn } from '@/components/animations/FadeIn';
 import { BackgroundAnimation } from '@/components/animations/BackgroundAnimation';
@@ -58,11 +60,66 @@ export default function Home() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [notes, setNotes] = useState<Note[]>(SAMPLE_NOTES);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState('default');
+  const [textScale, setTextScale] = useState(1);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const filteredNotes = notes.filter(note =>
     note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     note.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  const handleNavigate = (page: string) => {
+    if (page === 'Settings') {
+      setSettingsOpen(true);
+    } else if (page === 'Tags') {
+      setTagsOpen(true);
+    } else {
+      toast.success(`${page} feature coming soon!`);
+    }
+  };
+  
+  const handleThemeChange = (theme: string) => {
+    setCurrentTheme(theme);
+    toast.success(`Theme changed to ${theme}`);
+    
+    // Apply theme changes
+    const root = document.documentElement;
+    if (theme === 'white') {
+      root.style.setProperty('--background', '#ffffff');
+      root.style.setProperty('--foreground', '#000000');
+    } else if (theme === 'black') {
+      root.style.setProperty('--background', '#000000');
+      root.style.setProperty('--foreground', '#ffffff');
+    } else if (theme === 'blue') {
+      root.style.setProperty('--background', '#0a1929');
+      root.style.setProperty('--foreground', '#e3f2fd');
+    } else {
+      root.style.setProperty('--background', '#fafafa');
+      root.style.setProperty('--foreground', '#171717');
+    }
+  };
+  
+  const handleScaleChange = (scale: number) => {
+    setTextScale(scale);
+    document.documentElement.style.fontSize = `${scale * 16}px`;
+    toast.success(`Text scale set to ${scale}x`);
+  };
+  
+  const handleSelectTag = (tagId: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tagId)
+        ? prev.filter(t => t !== tagId)
+        : [...prev, tagId]
+    );
+  };
+  
+  // Apply text scale on mount
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${textScale * 16}px`;
+  }, [textScale]);
   
   const handleNewNote = () => {
     setSelectedNote(null);
@@ -150,7 +207,11 @@ export default function Home() {
       
       {/* Main Layout */}
       <div className="flex pt-24 md:pt-28 relative z-10">
-        <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          onNavigate={handleNavigate}
+        />
         
         <main className="flex-1 min-h-screen relative">
           {/* Statistics */}
@@ -174,6 +235,24 @@ export default function Home() {
         onClose={() => setEditorOpen(false)}
         note={selectedNote || undefined}
         onSave={handleSave}
+      />
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        currentTheme={currentTheme}
+        currentScale={textScale}
+        onThemeChange={handleThemeChange}
+        onScaleChange={handleScaleChange}
+      />
+      
+      {/* Tags Modal */}
+      <TagsModal
+        isOpen={tagsOpen}
+        onClose={() => setTagsOpen(false)}
+        onSelectTag={handleSelectTag}
+        selectedTags={selectedTags}
       />
       
       {/* Floating Action Button */}
