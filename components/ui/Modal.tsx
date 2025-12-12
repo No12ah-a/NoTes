@@ -38,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className={`glass rounded-3xl p-6 w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}
+              className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-3xl p-6 w-full ${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}
             >
               {/* Header */}
               {title && (

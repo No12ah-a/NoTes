@@ -36,7 +36,7 @@ export function ThemeToggle() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => setIsDark(!isDark)}
-      className="p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      className="p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
       aria-label="Toggle theme"
     >
       <motion.div

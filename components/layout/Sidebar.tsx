@@ -24,7 +24,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Mobile menu button */}
       <button
         onClick={onToggle}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg glass"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700"
       >
         <Menu className="w-6 h-6" />
       </button>
@@ -37,7 +37,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         }}
         className={`fixed lg:relative inset-y-0 left-0 z-40 w-72 p-4 ${!isOpen && 'hidden lg:block'}`}
       >
-        <Card variant="glass" className="h-full flex flex-col">
+        <Card variant="default" className="h-full flex flex-col">
           {/* Avatar section */}
           <div className="mb-6 text-center">
             <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-gradient-primary flex items-center justify-center text-white text-2xl font-bold">

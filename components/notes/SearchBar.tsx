@@ -32,7 +32,7 @@ export function SearchBar({ onSearch, placeholder = 'Search notes...' }: SearchB
             ? '0 0 0 3px rgba(102, 126, 234, 0.3)' 
             : '0 0 0 0px rgba(102, 126, 234, 0)',
         }}
-        className="relative flex items-center glass rounded-2xl overflow-hidden"
+        className="relative flex items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm"
       >
         <Search className="absolute left-4 w-5 h-5 text-gray-400" />
         
