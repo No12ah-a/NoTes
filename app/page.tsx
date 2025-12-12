@@ -3,17 +3,23 @@
 import React, { useState } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { NotesList } from '@/components/notes/NotesList';
+import { NoteEditor } from '@/components/notes/NoteEditor';
 import { SearchBar } from '@/components/notes/SearchBar';
 import { FloatingActionButton } from '@/components/layout/FloatingActionButton';
+import { Statistics } from '@/components/dashboard/Statistics';
 import { GradientText } from '@/components/ui/GradientText';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { ToastProvider, toast } from '@/components/ui/Toast';
 import { Sparkles } from 'lucide-react';
 import { FadeIn } from '@/components/animations/FadeIn';
+import { BackgroundAnimation } from '@/components/animations/BackgroundAnimation';
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<any>(null);
   
   // Sample notes data
   const sampleNotes = [
@@ -51,26 +57,54 @@ export default function Home() {
   );
   
   const handleNewNote = () => {
-    console.log('Create new note');
+    setSelectedNote(null);
+    setEditorOpen(true);
   };
   
   const handleEdit = (id: string) => {
-    console.log('Edit note:', id);
+    const note = notes.find(n => n.id === id);
+    if (note) {
+      setSelectedNote(note);
+      setEditorOpen(true);
+    }
   };
   
   const handleDelete = (id: string) => {
     setNotes(notes.filter(note => note.id !== id));
+    toast.success('Note deleted successfully');
   };
   
   const handleShare = (id: string) => {
-    console.log('Share note:', id);
+    toast.success('Note link copied to clipboard');
+  };
+  
+  const handleSave = (note: any) => {
+    if (note.id) {
+      // Update existing note
+      setNotes(notes.map(n => n.id === note.id ? { ...n, ...note } : n));
+      toast.success('Note updated successfully');
+    } else {
+      // Create new note
+      const newNote = {
+        ...note,
+        id: String(Date.now()),
+        createdAt: new Date(),
+      };
+      setNotes([newNote, ...notes]);
+      toast.success('Note created successfully');
+    }
+    setEditorOpen(false);
   };
   
   return (
-    <div className="min-h-screen bg-gradient-light dark:bg-gradient-dark">
+    <>
+      <ToastProvider />
+      <div className="min-h-screen bg-gradient-light dark:bg-gradient-dark relative">
+        {/* Background Animation */}
+        <BackgroundAnimation />
       {/* Header */}
       <FadeIn>
-        <header className="fixed top-0 left-0 right-0 z-30 glass border-b border-gray-200/20 dark:border-gray-700/20">
+        <header className="fixed top-0 left-0 right-0 z-30 glass border-b border-gray-200/20 dark:border-gray-700/20 relative">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -104,10 +138,16 @@ export default function Home() {
       </FadeIn>
       
       {/* Main Layout */}
-      <div className="flex pt-24 md:pt-28">
+      <div className="flex pt-24 md:pt-28 relative z-10">
         <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
         
-        <main className="flex-1 min-h-screen">
+        <main className="flex-1 min-h-screen relative">
+          {/* Statistics */}
+          <div className="p-6">
+            <Statistics />
+          </div>
+          
+          {/* Notes List */}
           <NotesList
             notes={filteredNotes}
             onEdit={handleEdit}
@@ -117,8 +157,17 @@ export default function Home() {
         </main>
       </div>
       
+      {/* Note Editor */}
+      <NoteEditor
+        isOpen={editorOpen}
+        onClose={() => setEditorOpen(false)}
+        note={selectedNote}
+        onSave={handleSave}
+      />
+      
       {/* Floating Action Button */}
       <FloatingActionButton onClick={handleNewNote} />
     </div>
+    </>
   );
 }
